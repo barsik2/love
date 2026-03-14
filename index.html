@@ -230,35 +230,62 @@
 
         /* Мобильная версия */
         @media (max-width: 768px) {
+            body, html {
+                overflow: auto;
+            }
+
+            #canvas-wrapper {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                padding-bottom: 40px;
+                box-sizing: border-box;
+            }
+
             #hearts-box {
-                width: 400px;
-                height: 400px;
-                transition: opacity 1s ease;
+                width: 90vw;
+                height: 90vw;
+                max-width: 400px;
+                max-height: 400px;
+                position: relative;
+                left: 50% !important;
+                transform: translateX(-50%);
+                margin: 40px auto 20px auto;
+                flex-shrink: 0;
+                order: 1;
             }
 
             #text-box {
-                left: 5%;
-                width: 90%;
-                top: 5%;
+                position: relative;
+                left: 0;
+                top: auto;
                 transform: none;
-                max-height: 90vh;
-                padding: 10px;
+                width: 100%;
+                max-height: none;
+                padding: 20px;
+                box-sizing: border-box;
+                opacity: 0;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 15px;
+                margin-top: 0;
+                order: 2;
             }
 
             .shifted #hearts-box {
-                left: 50%;
-                opacity: 0;
-                visibility: hidden;
+                left: 50% !important;
+                transform: translateX(-50%);
+                opacity: 1;
+                visibility: visible;
+                margin-bottom: 20px;
             }
 
             .shifted #text-box {
                 opacity: 1;
             }
 
-            /* Убедимся, что изображение остается видимым в мобильной версии */
-            .shifted #photo {
-                opacity: 1 !important;
-                transform: translateY(0) !important;
+            #hearts-container {
+                left: -40px !important;
+                top: -50px !important;
             }
 
             .heart {
@@ -285,6 +312,14 @@
 
             #photo {
                 max-width: 200px;
+            }
+        }
+
+        /* Экраны ~420px */
+        @media (max-width: 420px) {
+            #hearts-container {
+                left: -40px !important;
+                top: -50px !important;
             }
         }
     </style>
@@ -420,12 +455,17 @@
         // 3. Создание ПЛОТНОГО СЕРДЦА
         function createHearts() {
             const container = document.getElementById('hearts-container');
+            const heartsBox = document.getElementById('hearts-box');
+            const isMobile = window.innerWidth <= 768;
+            const size = isMobile ? 200 : 350; // Центр для мобильного / десктопа
+            const scale = isMobile ? 0.55 : 1; // Масштаб для мобильного
+            
             container.innerHTML = '';
 
             // Увеличиваем количество сердечек для большей плотности
             for (let i = 0; i < 600; i++) {
                 const t = Math.random() * 2 * Math.PI;
-                const r = Math.pow(Math.random(), 0.7) * 180;
+                const r = Math.pow(Math.random(), 0.7) * 180 * scale;
 
                 // Формула сердца (Cardioid)
                 const x = 16 * Math.pow(Math.sin(t), 3);
@@ -434,8 +474,8 @@
                 const h = document.createElement('div');
                 h.className = 'heart bloom-anim';
 
-                h.style.left = (350 + x * (r/9)) + 'px';
-                h.style.top = (350 + y * (r/9)) + 'px';
+                h.style.left = (size + x * (r/9)) + 'px';
+                h.style.top = (size + y * (r/9)) + 'px';
 
                 // Случайный цвет
                 h.style.backgroundColor = heartColors[Math.floor(Math.random() * heartColors.length)];
@@ -448,7 +488,7 @@
             setTimeout(() => {
                 for (let i = 0; i < 150; i++) {
                     const t = Math.random() * 2 * Math.PI;
-                    const r = Math.pow(Math.random(), 0.8) * 130;
+                    const r = Math.pow(Math.random(), 0.8) * 130 * scale;
 
                     const x = 16 * Math.pow(Math.sin(t), 3);
                     const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
@@ -456,8 +496,8 @@
                     const h = document.createElement('div');
                     h.className = 'heart bloom-anim';
 
-                    h.style.left = (350 + x * (r/7)) + 'px';
-                    h.style.top = (350 + y * (r/7)) + 'px';
+                    h.style.left = (size + x * (r/7)) + 'px';
+                    h.style.top = (size + y * (r/7)) + 'px';
 
                     h.style.backgroundColor = heartColors[Math.floor(Math.random() * heartColors.length)];
                     h.style.animationDelay = (0.5 + i * 0.003) + 's';
@@ -471,7 +511,7 @@
             setTimeout(() => {
                 for (let i = 0; i < 100; i++) {
                     const t = Math.random() * 2 * Math.PI;
-                    const r = Math.pow(Math.random(), 0.9) * 100;
+                    const r = Math.pow(Math.random(), 0.9) * 100 * scale;
 
                     const x = 16 * Math.pow(Math.sin(t), 3);
                     const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
@@ -481,8 +521,8 @@
 
                     h.style.width = '10px';
                     h.style.height = '10px';
-                    h.style.left = (350 + x * (r/6)) + 'px';
-                    h.style.top = (350 + y * (r/6)) + 'px';
+                    h.style.left = (size + x * (r/6)) + 'px';
+                    h.style.top = (size + y * (r/6)) + 'px';
 
                     h.style.backgroundColor = heartColors[Math.floor(Math.random() * heartColors.length)];
                     h.style.animationDelay = (1.0 + i * 0.002) + 's';
@@ -498,47 +538,43 @@
             const target = document.getElementById('typewriter');
             target.innerHTML = '';
 
-            // На мобильных устройствах скрываем сердечки при начале печати
-            if (window.innerWidth <= 768) {
-                document.getElementById('hearts-box').style.opacity = '0';
-                document.getElementById('hearts-box').style.visibility = 'hidden';
-            }
-
             for (const line of textLines) {
                 for (const char of line) {
                     target.innerHTML += char;
-                    await new Promise(r => setTimeout(r, 25)); // Увеличил скорость печати
+                    await new Promise(r => setTimeout(r, 25));
                 }
                 await new Promise(r => setTimeout(r, 100));
             }
-
-            // Фотография теперь видна сразу, без задержки
         }
 
         // 5. Поток анимации основной страницы
         window.onload = () => {
+            const isMobile = window.innerWidth <= 768;
+            
             // Шаг 1: Сердечки с небольшой задержкой
             setTimeout(createHearts, 300);
 
-            // Шаг 2: Сдвиг и Текст
+            // Шаг 2: Для мобильных - текст появляется снизу после сердечка
+            // Для десктопа - сдвиг вбок как раньше
             setTimeout(() => {
                 document.getElementById('canvas-wrapper').classList.add('shifted');
                 setTimeout(() => {
                     typeWriter();
-                }, 1200);
-            }, 3500);
+                }, isMobile ? 800 : 1200);
+            }, isMobile ? 2500 : 3500);
         };
 
         // Запускаем анимацию сразу
         setTimeout(() => {
+            const isMobile = window.innerWidth <= 768;
             setTimeout(createHearts, 300);
 
             setTimeout(() => {
                 document.getElementById('canvas-wrapper').classList.add('shifted');
                 setTimeout(() => {
                     typeWriter();
-                }, 1200);
-            }, 3500);
+                }, isMobile ? 800 : 1200);
+            }, isMobile ? 2500 : 3500);
         }, 100);
     }
 </script>
