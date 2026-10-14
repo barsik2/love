@@ -1,582 +1,818 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Для Женечки</title>
     <style>
-        :root {
-            --bg: #f5f0e8;
-            --green: #1b8a5a;
-            --accent: #ff4d6d;
-        }
+      :root {
+        --bg: #f5f0e8;
+        --green: #1b8a5a;
+        --accent: #ff4d6d;
+      }
 
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            background-color: var(--bg);
-            overflow: hidden;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--bg);
+        overflow: hidden;
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
 
-        /* ЭКРАН БЛОКИРОВКИ */
-        #lock-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd3 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
+      /* ЭКРАН БЛОКИРОВКИ */
+      #lock-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd3 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        transition:
+          opacity 0.8s ease,
+          transform 0.8s ease;
+      }
 
-        .lock-container {
-            text-align: center;
-            padding: 40px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            animation: float 3s ease-in-out infinite;
-        }
+      .lock-container {
+        text-align: center;
+        padding: 40px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        animation: float 3s ease-in-out infinite;
+      }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
         }
-
-        .lock-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            color: var(--accent);
+        50% {
+          transform: translateY(-10px);
         }
+      }
 
-        #code-input {
-            padding: 15px 25px;
-            font-size: 24px;
-            width: 200px;
-            text-align: center;
-            border: 3px solid #ddd;
-            border-radius: 10px;
-            outline: none;
-            transition: all 0.3s;
-            letter-spacing: 4px;
-            margin: 20px 0;
+      .lock-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        color: var(--accent);
+      }
+
+      #code-input {
+        padding: 15px 25px;
+        font-size: 24px;
+        width: 200px;
+        text-align: center;
+        border: 3px solid #ddd;
+        border-radius: 10px;
+        outline: none;
+        transition: all 0.3s;
+        letter-spacing: 4px;
+        margin: 20px 0;
+      }
+
+      #code-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+      }
+
+      .hint {
+        color: #888;
+        font-size: 14px;
+        margin-top: 15px;
+        font-style: italic;
+      }
+
+      .error-message {
+        color: #ff3333;
+        margin-top: 15px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      /* ОСНОВНАЯ СТРАНИЦА */
+      #love-page {
+        display: none;
+        width: 100%;
+        height: 100%;
+      }
+
+      #canvas-wrapper {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Контейнер для сердечек */
+      #hearts-box {
+        position: absolute;
+        width: 700px;
+        height: 700px;
+        left: 50%;
+        transform: translateX(-50%);
+        transition:
+          left 2.5s cubic-bezier(0.65, 0, 0.35, 1),
+          opacity 1s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+      }
+
+      /* Текст - Появляется слева */
+      #text-box {
+        position: absolute;
+        left: 10%;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 500px;
+        max-height: 80vh;
+        opacity: 0;
+        transition: opacity 2s ease;
+        z-index: 1;
+        overflow-y: auto;
+        padding: 20px;
+      }
+
+      #text-box::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #text-box::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+      }
+
+      #text-box::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 10px;
+      }
+
+      /* Состояние после сдвига */
+      .shifted #hearts-box {
+        left: 75%;
+      }
+      .shifted #text-box {
+        opacity: 1;
+      }
+
+      .shifted #photo {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Лепестки-сердечки */
+      .heart {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        transform: scale(0) rotate(-45deg);
+        background-color: var(--accent);
+      }
+      .heart::before,
+      .heart::after {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background-color: inherit;
+        border-radius: 50%;
+      }
+      .heart::before {
+        top: -6px;
+        left: 0;
+      }
+      .heart::after {
+        left: 6px;
+        top: 0;
+      }
+
+      .bloom-anim {
+        animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+      @keyframes pop {
+        0% {
+          transform: scale(0) rotate(-45deg);
+          opacity: 0;
         }
-
-        #code-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+        100% {
+          transform: scale(1) rotate(-45deg);
+          opacity: 0.9;
         }
+      }
 
-        .hint {
-            color: #888;
-            font-size: 14px;
-            margin-top: 15px;
-            font-style: italic;
-        }
+      /* Стили текста */
+      #typewriter {
+        font-size: 16px;
+        color: #333;
+        line-height: 1.6;
+        min-height: 200px;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        text-align: justify;
+        margin-bottom: 30px;
+      }
 
-        .error-message {
-            color: #ff3333;
-            margin-top: 15px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
+      .photo-container {
+        text-align: center;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
 
-        /* ОСНОВНАЯ СТРАНИЦА */
-        #love-page {
-            display: none;
-            width: 100%;
-            height: 100%;
+      .photo-container:hover {
+        transform: scale(1.05);
+      }
+
+      .photo-container:hover #photo {
+        box-shadow: 0 15px 35px rgba(255, 77, 109, 0.4);
+      }
+
+      #photo {
+        max-width: 250px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition:
+          transform 0.5s ease,
+          opacity 2s ease,
+          box-shadow 0.3s ease;
+        opacity: 1;
+        transform: translateY(0);
+        margin: 0 auto;
+        display: block;
+        border: 5px solid white;
+      }
+
+      .photo-caption {
+        font-size: 16px;
+        color: #666;
+        margin-top: 10px;
+        font-style: italic;
+        font-weight: 500;
+      }
+
+      .signature {
+        font-size: 22px;
+        color: var(--accent);
+        text-align: right;
+        margin-top: 20px;
+        font-weight: bold;
+        font-family: "Segoe UI", cursive;
+      }
+
+      /* === СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА С ВИДЕО === */
+      #video-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 200;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+
+      #video-modal.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .modal-content {
+        position: relative;
+        text-align: center;
+        width: 90%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transform: scale(0.9);
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      #video-modal.active .modal-content {
+        transform: scale(1);
+      }
+
+      .close-modal {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 45px;
+        height: 45px;
+        background: var(--accent);
+        color: white;
+        border-radius: 50%;
+        font-size: 28px;
+        line-height: 45px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.2s,
+          background 0.2s;
+        user-select: none;
+      }
+
+      .close-modal:hover {
+        transform: scale(1.1);
+        background: #ff3355;
+      }
+
+      .modal-text {
+        color: white;
+        font-size: 26px;
+        margin-bottom: 25px;
+        font-weight: bold;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        line-height: 1.4;
+      }
+
+      #surprise-video {
+        width: 100%;
+        max-height: 60vh;
+        border-radius: 15px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        outline: none;
+        background: #000;
+      }
+
+      /* Мобильная версия */
+      @media (max-width: 768px) {
+        body,
+        html {
+          overflow: auto;
         }
 
         #canvas-wrapper {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+          flex-direction: column;
+          height: auto;
+          min-height: 100vh;
+          padding-bottom: 40px;
+          box-sizing: border-box;
         }
 
-        /* Контейнер для сердечек */
         #hearts-box {
-            position: absolute;
-            width: 700px;
-            height: 700px;
-            left: 50%;
-            transform: translateX(-50%);
-            transition: left 2.5s cubic-bezier(0.65, 0, 0.35, 1), opacity 1s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2;
+          width: 90vw;
+          height: 90vw;
+          max-width: 400px;
+          max-height: 400px;
+          position: relative;
+          left: 50% !important;
+          transform: translateX(-50%);
+          margin: 40px auto 20px auto;
+          flex-shrink: 0;
+          order: 1;
         }
 
-        /* Текст - Появляется слева */
         #text-box {
-            position: absolute;
-            left: 10%;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 500px;
-            max-height: 80vh;
-            opacity: 0;
-            transition: opacity 2s ease;
-            z-index: 1;
-            overflow-y: auto;
-            padding: 20px;
+          position: relative;
+          left: 0;
+          top: auto;
+          transform: none;
+          width: 100%;
+          max-height: none;
+          padding: 20px;
+          box-sizing: border-box;
+          opacity: 0;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 15px;
+          margin-top: 0;
+          order: 2;
         }
 
-        #text-box::-webkit-scrollbar {
-            width: 6px;
+        .shifted #hearts-box {
+          left: 50% !important;
+          transform: translateX(-50%);
+          opacity: 1;
+          visibility: visible;
+          margin-bottom: 20px;
         }
 
-        #text-box::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
+        .shifted #text-box {
+          opacity: 1;
         }
 
-        #text-box::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 10px;
+        #hearts-container {
+          left: -40px !important;
+          top: -50px !important;
         }
 
-        /* Состояние после сдвига */
-        .shifted #hearts-box { left: 75%; }
-        .shifted #text-box { opacity: 1; }
-
-        /* Убедимся, что изображение остается видимым */
-        .shifted #photo { opacity: 1; transform: translateY(0); }
-
-        /* Лепестки-сердечки */
         .heart {
-            position: absolute;
-            width: 12px; height: 12px;
-            opacity: 0;
-            transform: scale(0) rotate(-45deg);
-            background-color: var(--accent);
-        }
-        .heart::before, .heart::after {
-            content: ""; position: absolute;
-            width: 12px; height: 12px;
-            background-color: inherit; border-radius: 50%;
-        }
-        .heart::before { top: -6px; left: 0; }
-        .heart::after { left: 6px; top: 0; }
-
-        /* Эффект как на видео - поп-ап с отскоком */
-        .bloom-anim {
-            animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        @keyframes pop {
-            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-            100% { transform: scale(1) rotate(-45deg); opacity: 0.9; }
+          width: 10px;
+          height: 10px;
         }
 
-        /* Стили текста */
+        .heart::before,
+        .heart::after {
+          width: 10px;
+          height: 10px;
+        }
+
+        .heart::before {
+          top: -5px;
+        }
+        .heart::after {
+          left: 5px;
+        }
+
         #typewriter {
-            font-size: 16px;
-            color: #333;
-            line-height: 1.6;
-            min-height: 200px;
-            font-weight: 300;
-            letter-spacing: 0.5px;
-            text-align: justify;
-            margin-bottom: 30px;
+          font-size: 14px;
+          min-height: 150px;
         }
 
         .photo-container {
-            text-align: center;
-            padding-top: 20px;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+          padding-top: 8px;
         }
 
         #photo {
-            max-width: 250px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            transition: transform 0.5s ease, opacity 2s ease;
-            opacity: 1;
-            transform: translateY(0);
-            margin: 0 auto;
-            display: block;
-            border: 5px solid white;
+          max-width: 200px;
         }
 
-        .photo-visible {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
+        /* Адаптация модального окна для мобильных */
+        .modal-text {
+          font-size: 20px;
+          margin-bottom: 15px;
         }
 
-        .photo-caption {
-            font-size: 16px;
-            color: #666;
-            margin-top: 10px;
-            font-style: italic;
+        .modal-content {
+          padding: 20px 15px;
+          width: 95%;
         }
 
-        .signature {
-            font-size: 22px;
-            color: var(--accent);
-            text-align: right;
-            margin-top: 20px;
-            font-weight: bold;
-            font-family: 'Segoe UI', cursive;
+        .close-modal {
+          top: -15px;
+          right: -10px;
+          width: 40px;
+          height: 40px;
+          line-height: 40px;
+          font-size: 24px;
         }
+      }
 
-        /* Мобильная версия */
-        @media (max-width: 768px) {
-            body, html {
-                overflow: auto;
-            }
-
-            #canvas-wrapper {
-                flex-direction: column;
-                height: auto;
-                min-height: 100vh;
-                padding-bottom: 40px;
-                box-sizing: border-box;
-            }
-
-            #hearts-box {
-                width: 90vw;
-                height: 90vw;
-                max-width: 400px;
-                max-height: 400px;
-                position: relative;
-                left: 50% !important;
-                transform: translateX(-50%);
-                margin: 40px auto 20px auto;
-                flex-shrink: 0;
-                order: 1;
-            }
-
-            #text-box {
-                position: relative;
-                left: 0;
-                top: auto;
-                transform: none;
-                width: 100%;
-                max-height: none;
-                padding: 20px;
-                box-sizing: border-box;
-                opacity: 0;
-                background: rgba(255, 255, 255, 0.9);
-                border-radius: 15px;
-                margin-top: 0;
-                order: 2;
-            }
-
-            .shifted #hearts-box {
-                left: 50% !important;
-                transform: translateX(-50%);
-                opacity: 1;
-                visibility: visible;
-                margin-bottom: 20px;
-            }
-
-            .shifted #text-box {
-                opacity: 1;
-            }
-
-            #hearts-container {
-                left: -40px !important;
-                top: -50px !important;
-            }
-
-            .heart {
-                width: 10px;
-                height: 10px;
-            }
-
-            .heart::before, .heart::after {
-                width: 10px;
-                height: 10px;
-            }
-
-            .heart::before { top: -5px; }
-            .heart::after { left: 5px; }
-
-            #typewriter {
-                font-size: 14px;
-                min-height: 150px;
-            }
-
-            .photo-container {
-                padding-top: 8px;
-            }
-
-            #photo {
-                max-width: 200px;
-            }
+      @media (max-width: 420px) {
+        #hearts-container {
+          left: -40px !important;
+          top: -50px !important;
         }
-
-        /* Экраны ~420px */
-        @media (max-width: 420px) {
-            #hearts-container {
-                left: -40px !important;
-                top: -50px !important;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
-<!-- ЭКРАН БЛОКИРОВКИ -->
-<div id="lock-screen">
-    <div class="lock-container">
+  </head>
+  <body>
+    <!-- ЭКРАН БЛОКИРОВКИ -->
+    <div id="lock-screen">
+      <div class="lock-container">
         <div class="lock-icon">🔒</div>
-        <h1 style="color: #333; margin-bottom: 10px;">Секретное послание</h1>
-        <p style="color: #666; margin-bottom: 30px;">Введи нашу дату чтобы открыть</p>
+        <h1 style="color: #333; margin-bottom: 10px">Секретное послание</h1>
+        <p style="color: #666; margin-bottom: 30px">
+          Введи нашу дату чтобы открыть
+        </p>
 
-        <input type="password" id="code-input" maxlength="6" placeholder="______" autocomplete="off">
+        <input
+          type="password"
+          id="code-input"
+          maxlength="6"
+          placeholder="______"
+          autocomplete="off"
+        />
         <div class="hint">Подсказка: день.месяц.год (6 цифр)</div>
-        <div id="error-message" class="error-message">Неверный код. Попробуй еще раз.</div>
+        <div id="error-message" class="error-message">
+          Неверный код. Попробуй еще раз.
+        </div>
+      </div>
     </div>
-</div>
 
-<!-- ОСНОВНАЯ СТРАНИЦА -->
-<div id="love-page">
-    <div id="canvas-wrapper">
+    <!-- ОСНОВНАЯ СТРАНИЦА -->
+    <div id="love-page">
+      <div id="canvas-wrapper">
         <!-- Текст -->
         <div id="text-box">
-            <div id="typewriter"></div>
-            <div class="photo-container">
-                <img id="photo" src="public/love.png" alt="Наше фото">
-                <div class="photo-caption">Ты - моё солнышко ☀️</div>
-            </div>
+          <div id="typewriter"></div>
+          <div class="photo-container" id="sun-trigger">
+            <img id="photo" src="public/love.png" alt="Наше фото" />
+            <div class="photo-caption">Ты мое солнышко ☀️</div>
+          </div>
         </div>
 
         <!-- Сердечки -->
         <div id="hearts-box">
-            <div id="hearts-container" style="position: absolute; width: 100%; height: 100%;"></div>
+          <div
+            id="hearts-container"
+            style="position: absolute; width: 100%; height: 100%"
+          ></div>
         </div>
+      </div>
     </div>
-</div>
 
-<script>
-    // 1. Обработка экрана блокировки
-    document.addEventListener('DOMContentLoaded', function() {
-        const lockScreen = document.getElementById('lock-screen');
-        const lovePage = document.getElementById('love-page');
-        const codeInput = document.getElementById('code-input');
-        const errorMessage = document.getElementById('error-message');
+    <div id="video-modal">
+      <div class="modal-content">
+        <div class="close-modal">&times;</div>
+        <div class="modal-text">
+          Ты моё солнышко, которое согревает меня каждый день! ☀️❤️
+        </div>
 
-        // Автофокус на поле ввода
+        <video id="surprise-video" controls playsinline preload="metadata">
+          <source src="public/zhenyaLove.mp4" type="video/mp4" />
+          Ваш браузер не поддерживает воспроизведение видео.
+        </video>
+      </div>
+    </div>
+
+    <script>
+      // 1. Обработка экрана блокировки
+      document.addEventListener("DOMContentLoaded", function () {
+        const lockScreen = document.getElementById("lock-screen");
+        const lovePage = document.getElementById("love-page");
+        const codeInput = document.getElementById("code-input");
+        const errorMessage = document.getElementById("error-message");
+
         codeInput.focus();
 
-        // Обработка ввода кода
-        codeInput.addEventListener('input', function(e) {
-            // Удаляем все нецифры
-            this.value = this.value.replace(/\D/g, '');
+        codeInput.addEventListener("input", function (e) {
+          this.value = this.value.replace(/\D/g, "");
 
-            // Показываем ошибку, если есть неверный символ
-            if (e.data && /\D/.test(e.data)) {
-                showError();
+          if (e.data && /\D/.test(e.data)) {
+            showError();
+          } else {
+            hideError();
+          }
+
+          if (this.value.length === 6) {
+            if (this.value === "151225") {
+              unlockPage();
             } else {
-                hideError();
+              showError();
+              this.value = "";
+              setTimeout(() => {
+                this.focus();
+              }, 100);
             }
-
-            // Автоматическая проверка при вводе 6 цифр
-            if (this.value.length === 6) {
-                if (this.value === '151225') {
-                    // Правильный код
-                    unlockPage();
-                } else {
-                    showError();
-                    // Сброс с анимацией
-                    this.value = '';
-                    setTimeout(() => {
-                        this.focus();
-                    }, 100);
-                }
-            }
+          }
         });
 
-        // Также проверка по Enter
-        codeInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && this.value.length === 6) {
-                if (this.value === '151225') {
-                    unlockPage();
-                } else {
-                    showError();
-                    this.value = '';
-                }
+        codeInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter" && this.value.length === 6) {
+            if (this.value === "151225") {
+              unlockPage();
+            } else {
+              showError();
+              this.value = "";
             }
+          }
         });
 
         function showError() {
-            errorMessage.style.opacity = '1';
-            codeInput.style.borderColor = '#ff3333';
-            codeInput.style.boxShadow = '0 0 15px rgba(255, 51, 51, 0.3)';
+          errorMessage.style.opacity = "1";
+          codeInput.style.borderColor = "#ff3333";
+          codeInput.style.boxShadow = "0 0 15px rgba(255, 51, 51, 0.3)";
         }
 
         function hideError() {
-            errorMessage.style.opacity = '0';
-            codeInput.style.borderColor = '#ddd';
-            codeInput.style.boxShadow = 'none';
+          errorMessage.style.opacity = "0";
+          codeInput.style.borderColor = "#ddd";
+          codeInput.style.boxShadow = "none";
         }
 
         function unlockPage() {
-            // Анимация исчезновения экрана блокировки
-            lockScreen.style.opacity = '0';
-            lockScreen.style.transform = 'scale(1.1)';
+          lockScreen.style.opacity = "0";
+          lockScreen.style.transform = "scale(1.1)";
 
-            setTimeout(() => {
-                lockScreen.style.display = 'none';
-                lovePage.style.display = 'block';
-
-                // Инициализация основной страницы
-                initLovePage();
-            }, 800);
+          setTimeout(() => {
+            lockScreen.style.display = "none";
+            lovePage.style.display = "block";
+            initLovePage();
+          }, 800);
         }
-    });
+      });
 
-    // 2. Конфигурация основной страницы
-    function initLovePage() {
-        const heartColors = ['#ff4d6d', '#ff758f', '#ff8fa3', '#ffb3c1', '#ffd60a', '#ff9f1c', '#ff0054'];
-
-        // Текст послания
-        const textLines = [
-            "Я очень рад встретить такого доброго, светлого, невероятно теплого и, конечно же, самого красивого человека в своей жизни!\n\n",
-            "Ты подарила мне столько позитивных эмоций, что я хочу порадовать тебя тем же самым и сделать для тебя хотя бы что-то приятное)\n\n",
-            "Надеюсь, что тебе понравится этот небольшой проект, который я сделал для тебя!\n\n",
-            "Если тебе будет трудно или грустно, ты можешь зайти сюда (лучше, конечно, обратиться ко мне напрямую, вдруг сайт этот упадет, его же делал я ахах) и вспомнить, что я тебя безумно люблю и считаю самой лучшей девочкой на свете.\n\n",
-            "Вроде бы мы совсем недавно начали строить наши отношения, но я уже не могу представить свою жизнь без тебя и очень дорожу нашими отношениями.\n\n",
-            "Ты стала для меня лучиком солнца, который освещает мне путь и надеюсь, что я хоть как-нибудь смогу тебе помочь и отплатить за твою доброту и за то, что принимаешь меня таким, какой я есть.\n\n",
-            "Ты - самый важный человек для меня и мне нравится в тебе абсолютно все, поэтому можешь на меня положиться!\n\n",
-            "Я всегда буду на твоей стороне и никогда тебя не осужу...\n\n"
+      // 2. Конфигурация основной страницы
+      function initLovePage() {
+        const heartColors = [
+          "#ff4d6d",
+          "#ff758f",
+          "#ff8fa3",
+          "#ffb3c1",
+          "#ffd60a",
+          "#ff9f1c",
+          "#ff0054",
         ];
 
-        // 3. Создание ПЛОТНОГО СЕРДЦА
+        const textLines = [
+          "Я очень рад встретить такого доброго, светлого, невероятно теплого и, конечно же, самого красивого человека в своей жизни!\n\n",
+          "Ты подарила мне столько позитивных эмоций, что я хочу порадовать тебя тем же самым и сделать для тебя хотя бы что-то приятное)\n\n",
+          "Надеюсь, что тебе понравится этот небольшой проект, который я сделал для тебя!\n\n",
+          "Если тебе будет трудно или грустно, ты можешь зайти сюда (лучше, конечно, обратиться ко мне напрямую, вдруг сайт этот упадет, его же делал я ахах) и вспомнить, что я тебя безумно люблю и считаю самой лучшей девочкой на свете.\n\n",
+          "Вроде бы мы совсем недавно начали строить наши отношения, но я уже не могу представить свою жизнь без тебя и очень дорожу нашими отношениями.\n\n",
+          "Ты стала для меня лучиком солнца, который освещает мне путь и надеюсь, что я хоть как-нибудь смогу тебе помочь и отплатить за твою доброту и за то, что принимаешь меня таким, какой я есть.\n\n",
+          "Ты - самый важный человек для меня и мне нравится в тебе абсолютно все, поэтому можешь на меня положиться!\n\n",
+          "Я всегда буду на твоей стороне и никогда тебя не осужу...\n\n",
+        ];
+
         function createHearts() {
-            const container = document.getElementById('hearts-container');
-            const heartsBox = document.getElementById('hearts-box');
-            const isMobile = window.innerWidth <= 768;
-            const size = isMobile ? 200 : 350; // Центр для мобильного / десктопа
-            const scale = isMobile ? 0.55 : 1; // Масштаб для мобильного
-            
-            container.innerHTML = '';
+          const container = document.getElementById("hearts-container");
+          const heartsBox = document.getElementById("hearts-box");
+          const isMobile = window.innerWidth <= 768;
+          const size = isMobile ? 200 : 350;
+          const scale = isMobile ? 0.55 : 1;
 
-            // Увеличиваем количество сердечек для большей плотности
-            for (let i = 0; i < 600; i++) {
-                const t = Math.random() * 2 * Math.PI;
-                const r = Math.pow(Math.random(), 0.7) * 180 * scale;
+          container.innerHTML = "";
 
-                // Формула сердца (Cardioid)
-                const x = 16 * Math.pow(Math.sin(t), 3);
-                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+          for (let i = 0; i < 600; i++) {
+            const t = Math.random() * 2 * Math.PI;
+            const r = Math.pow(Math.random(), 0.7) * 180 * scale;
 
-                const h = document.createElement('div');
-                h.className = 'heart bloom-anim';
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(
+              13 * Math.cos(t) -
+              5 * Math.cos(2 * t) -
+              2 * Math.cos(3 * t) -
+              Math.cos(4 * t)
+            );
 
-                h.style.left = (size + x * (r/9)) + 'px';
-                h.style.top = (size + y * (r/9)) + 'px';
+            const h = document.createElement("div");
+            h.className = "heart bloom-anim";
 
-                // Случайный цвет
-                h.style.backgroundColor = heartColors[Math.floor(Math.random() * heartColors.length)];
-                h.style.animationDelay = (i * 0.005) + 's';
+            h.style.left = size + x * (r / 9) + "px";
+            h.style.top = size + y * (r / 9) + "px";
 
-                container.appendChild(h);
+            h.style.backgroundColor =
+              heartColors[Math.floor(Math.random() * heartColors.length)];
+            h.style.animationDelay = i * 0.005 + "s";
+
+            container.appendChild(h);
+          }
+
+          setTimeout(() => {
+            for (let i = 0; i < 150; i++) {
+              const t = Math.random() * 2 * Math.PI;
+              const r = Math.pow(Math.random(), 0.8) * 130 * scale;
+
+              const x = 16 * Math.pow(Math.sin(t), 3);
+              const y = -(
+                13 * Math.cos(t) -
+                5 * Math.cos(2 * t) -
+                2 * Math.cos(3 * t) -
+                Math.cos(4 * t)
+              );
+
+              const h = document.createElement("div");
+              h.className = "heart bloom-anim";
+
+              h.style.left = size + x * (r / 7) + "px";
+              h.style.top = size + y * (r / 7) + "px";
+
+              h.style.backgroundColor =
+                heartColors[Math.floor(Math.random() * heartColors.length)];
+              h.style.animationDelay = 0.5 + i * 0.003 + "s";
+              h.style.opacity = "0.8";
+
+              container.appendChild(h);
             }
+          }, 800);
 
-            // Добавляем второй слой для заполнения пустот
-            setTimeout(() => {
-                for (let i = 0; i < 150; i++) {
-                    const t = Math.random() * 2 * Math.PI;
-                    const r = Math.pow(Math.random(), 0.8) * 130 * scale;
+          setTimeout(() => {
+            for (let i = 0; i < 100; i++) {
+              const t = Math.random() * 2 * Math.PI;
+              const r = Math.pow(Math.random(), 0.9) * 100 * scale;
 
-                    const x = 16 * Math.pow(Math.sin(t), 3);
-                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+              const x = 16 * Math.pow(Math.sin(t), 3);
+              const y = -(
+                13 * Math.cos(t) -
+                5 * Math.cos(2 * t) -
+                2 * Math.cos(3 * t) -
+                Math.cos(4 * t)
+              );
 
-                    const h = document.createElement('div');
-                    h.className = 'heart bloom-anim';
+              const h = document.createElement("div");
+              h.className = "heart bloom-anim";
 
-                    h.style.left = (size + x * (r/7)) + 'px';
-                    h.style.top = (size + y * (r/7)) + 'px';
+              h.style.width = "10px";
+              h.style.height = "10px";
+              h.style.left = size + x * (r / 6) + "px";
+              h.style.top = size + y * (r / 6) + "px";
 
-                    h.style.backgroundColor = heartColors[Math.floor(Math.random() * heartColors.length)];
-                    h.style.animationDelay = (0.5 + i * 0.003) + 's';
-                    h.style.opacity = '0.8';
+              h.style.backgroundColor =
+                heartColors[Math.floor(Math.random() * heartColors.length)];
+              h.style.animationDelay = 1.0 + i * 0.002 + "s";
+              h.style.opacity = "0.7";
 
-                    container.appendChild(h);
-                }
-            }, 800);
-
-            // Третий слой - совсем маленькие сердечки для детализации
-            setTimeout(() => {
-                for (let i = 0; i < 100; i++) {
-                    const t = Math.random() * 2 * Math.PI;
-                    const r = Math.pow(Math.random(), 0.9) * 100 * scale;
-
-                    const x = 16 * Math.pow(Math.sin(t), 3);
-                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-
-                    const h = document.createElement('div');
-                    h.className = 'heart bloom-anim';
-
-                    h.style.width = '10px';
-                    h.style.height = '10px';
-                    h.style.left = (size + x * (r/6)) + 'px';
-                    h.style.top = (size + y * (r/6)) + 'px';
-
-                    h.style.backgroundColor = heartColors[Math.floor(Math.random() * heartColors.length)];
-                    h.style.animationDelay = (1.0 + i * 0.002) + 's';
-                    h.style.opacity = '0.7';
-
-                    container.appendChild(h);
-                }
-            }, 1200);
+              container.appendChild(h);
+            }
+          }, 1200);
         }
 
-        // 4. Печатная машинка
         async function typeWriter() {
-            const target = document.getElementById('typewriter');
-            target.innerHTML = '';
+          const target = document.getElementById("typewriter");
+          target.innerHTML = "";
 
-            for (const line of textLines) {
-                for (const char of line) {
-                    target.innerHTML += char;
-                    await new Promise(r => setTimeout(r, 25));
-                }
-                await new Promise(r => setTimeout(r, 100));
+          for (const line of textLines) {
+            for (const char of line) {
+              target.innerHTML += char;
+              await new Promise((r) => setTimeout(r, 25));
             }
+            await new Promise((r) => setTimeout(r, 100));
+          }
         }
 
-        // 5. Поток анимации основной страницы
         window.onload = () => {
-            const isMobile = window.innerWidth <= 768;
-            
-            // Шаг 1: Сердечки с небольшой задержкой
-            setTimeout(createHearts, 300);
+          const isMobile = window.innerWidth <= 768;
 
-            // Шаг 2: Для мобильных - текст появляется снизу после сердечка
-            // Для десктопа - сдвиг вбок как раньше
-            setTimeout(() => {
-                document.getElementById('canvas-wrapper').classList.add('shifted');
-                setTimeout(() => {
-                    typeWriter();
-                }, isMobile ? 800 : 1200);
-            }, isMobile ? 2500 : 3500);
+          setTimeout(createHearts, 300);
+
+          setTimeout(
+            () => {
+              document
+                .getElementById("canvas-wrapper")
+                .classList.add("shifted");
+              setTimeout(
+                () => {
+                  typeWriter();
+                },
+                isMobile ? 800 : 1200,
+              );
+            },
+            isMobile ? 2500 : 3500,
+          );
         };
 
-        // Запускаем анимацию сразу
         setTimeout(() => {
-            const isMobile = window.innerWidth <= 768;
-            setTimeout(createHearts, 300);
+          const isMobile = window.innerWidth <= 768;
+          setTimeout(createHearts, 300);
 
-            setTimeout(() => {
-                document.getElementById('canvas-wrapper').classList.add('shifted');
-                setTimeout(() => {
-                    typeWriter();
-                }, isMobile ? 800 : 1200);
-            }, isMobile ? 2500 : 3500);
+          setTimeout(
+            () => {
+              document
+                .getElementById("canvas-wrapper")
+                .classList.add("shifted");
+              setTimeout(
+                () => {
+                  typeWriter();
+                },
+                isMobile ? 800 : 1200,
+              );
+            },
+            isMobile ? 2500 : 3500,
+          );
         }, 100);
-    }
-</script>
-</body>
+
+        // 3. ЛОГИКА ОТКРЫТИЯ ВИДЕО ПРИ КЛИКЕ НА "СОЛНЫШКО"
+        const sunTrigger = document.getElementById("sun-trigger");
+        const videoModal = document.getElementById("video-modal");
+        const closeModalBtn = document.querySelector(".close-modal");
+        const videoElement = document.getElementById("surprise-video");
+
+        // Открытие окна
+        sunTrigger.addEventListener("click", () => {
+          videoModal.classList.add("active");
+          // Запускаем видео. Т.к. это происходит по клику пользователя, браузер разрешит воспроизведение СО ЗВУКОМ.
+          videoElement.play().catch((error) => {
+            console.log("Автовоспроизведение заблокировано браузером:", error);
+          });
+        });
+
+        // Функция закрытия
+        function closeVideoModal() {
+          videoModal.classList.remove("active");
+          videoElement.pause(); // Останавливаем видео и звук
+          videoElement.currentTime = 0; // Сбрасываем на начало
+        }
+
+        // Закрытие по крестику
+        closeModalBtn.addEventListener("click", closeVideoModal);
+
+        // Закрытие по клику на темный фон (вне видео)
+        videoModal.addEventListener("click", (e) => {
+          if (e.target === videoModal) {
+            closeVideoModal();
+          }
+        });
+
+        // Закрытие по клавише Esc
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && videoModal.classList.contains("active")) {
+            closeVideoModal();
+          }
+        });
+      }
+    </script>
+  </body>
 </html>
